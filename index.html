@@ -9,7 +9,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #0b0b0b;
+            background: linear-gradient(135deg, #1A2A44, #5C2E2E); /* Dark blue to reddish-brown gradient */
             font-family: 'Inter', sans-serif;
             display: flex;
             justify-content: center;
@@ -19,7 +19,7 @@
         }
 
         .container {
-            background-color: #0b0b0b;
+            background: linear-gradient(135deg, #1A2A44, #5C2E2E); /* Match body background */
             border-radius: 10px;
             padding: 20px;
             text-align: center;
@@ -53,6 +53,7 @@
             border-radius: 50%;
             display: block;
             margin: 20px auto;
+            border: 4px solid #ffffff; /* Default white border */
         }
 
         .borders {
@@ -135,6 +136,7 @@
             #preview {
                 width: 250px;
                 height: 250px;
+                border: 3px solid #ffffff; /* Adjusted border for mobile */
             }
 
             .borders {
@@ -183,15 +185,23 @@
         let userImg = null;
         let borders = [];
 
-        // Load border images
+        // Load border images with error handling
         for (let i = 1; i <= 3; i++) {
             let img = new Image();
             img.src = `https://github.com/PellerC/intuition-pfp/raw/main/border${i}.png`;
+            img.onerror = () => console.error(`Failed to load border${i}.png`);
             borders.push(img);
         }
 
-        // Redraw function
+        // Redraw function with dynamic border
         function redraw() {
+            const selected = getSelectedBorder();
+            // Update canvas border based on selected border
+            canvas.style.border = selected === 3 ? '4px solid #000000' : '4px solid #ffffff';
+            if (window.innerWidth <= 600) {
+                canvas.style.border = selected === 3 ? '3px solid #000000' : '3px solid #ffffff';
+            }
+
             ctx.clearRect(0, 0, width, height);
 
             // Draw white circle background clipped
@@ -213,10 +223,15 @@
             }
             ctx.restore();
 
-            // Draw selected border overlay (not clipped)
-            const selected = getSelectedBorder();
+            // Draw selected border overlay (not clipped), scaled to fit canvas
             if (selected > 0 && borders[selected - 1].complete) {
-                ctx.drawImage(borders[selected - 1], 0, 0, width, height);
+                const borderImg = borders[selected - 1];
+                const scale = Math.min(width / borderImg.width, height / borderImg.height);
+                const dw = borderImg.width * scale;
+                const dh = borderImg.height * scale;
+                const dx = (width - dw) / 2;
+                const dy = (height - dh) / 2;
+                ctx.drawImage(borderImg, dx, dy, dw, dh);
             }
         }
 
