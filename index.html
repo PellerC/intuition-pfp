@@ -98,6 +98,21 @@
             font-size: 0.9em;
         }
 
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+
+        .footer a {
+            color: #1DA1F2;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
         @media (max-width: 600px) {
             .logo {
                 width: 50px;
@@ -131,12 +146,16 @@
                 flex-direction: column;
                 gap: 10px;
             }
+
+            .footer {
+                font-size: 0.7em;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <img src="https://github.com/your-username/your-repo/raw/main/mainlogo.png" alt="Intuition Logo" class="logo">
+        <img src="https://github.com/PellerC/intuition-pfp/raw/main/mainlogo.png" alt="Intuition Logo" class="logo">
         <h1>Intuition PFP Generator</h1>
         <p>Join our community and transform your profile picture into a unique Intuition PFP with custom borders!</p>
         <canvas id="preview" width="300" height="300"></canvas>
@@ -149,6 +168,9 @@
             <label for="upload">Upload PFP</label>
             <input type="file" id="upload" accept="image/*">
             <button id="download">Download PFP</button>
+        </div>
+        <div class="footer">
+            Built with Love by <a href="https://twitter.com/opeyemi21094" target="_blank">NEWBIE</a>
         </div>
     </div>
     <script>
@@ -164,7 +186,7 @@
         // Load border images
         for (let i = 1; i <= 3; i++) {
             let img = new Image();
-            img.src = `https://github.com/your-username/your-repo/raw/main/border${i}.png`;
+            img.src = `https://github.com/PellerC/intuition-pfp/raw/main/border${i}.png`;
             borders.push(img);
         }
 
@@ -180,9 +202,9 @@
             ctx.fillStyle = 'white';
             ctx.fillRect(0, 0, width, height);
 
-            // Draw user image if available, clipped to circle
+            // Draw user image if available, centered and scaled to fit within circle
             if (userImg) {
-                const scale = Math.max(width / userImg.width, height / userImg.height);
+                const scale = Math.min(width / userImg.width, height / userImg.height) * 0.9; // 90% to fit within borders
                 const dw = userImg.width * scale;
                 const dh = userImg.height * scale;
                 const dx = (width - dw) / 2;
