@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intuition PFP Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #0b0b0b;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        .container {
+            background-color: #0b0b0b;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-sizing: border-box;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 10px 0;
+        }
+
+        p {
+            font-size: 0.9em;
+            font-weight: 400;
+            color: #ffffff;
+            margin: 0 0 20px 0;
+        }
+
+        #preview {
+            background-color: transparent;
+            border-radius: 50%;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .borders {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .borders label {
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .buttons input[type="file"] {
+            display: none;
+        }
+
+        .buttons label {
+            background-color: #ffffff;
+            color: #0b0b0b;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        .buttons button {
+            background-color: #ffffff;
+            color: #0b0b0b;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 600px) {
+            .logo {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 15px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            p {
+                font-size: 0.85em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            #preview {
+                width: 250px;
+                height: 250px;
+            }
+
+            .borders {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="https://github.com/your-username/your-repo/raw/main/mainlogo.png" alt="Intuition Logo" class="logo">
+        <h1>Intuition PFP Generator</h1>
+        <p>Join our community and transform your profile picture into a unique Intuition PFP with custom borders!</p>
+        <canvas id="preview" width="300" height="300"></canvas>
+        <div class="borders">
+            <label><input type="radio" name="border" value="1" checked> Border 1</label>
+            <label><input type="radio" name="border" value="2"> Border 2</label>
+            <label><input type="radio" name="border" value="3"> Border 3</label>
+        </div>
+        <div class="buttons">
+            <label for="upload">Upload PFP</label>
+            <input type="file" id="upload" accept="image/*">
+            <button id="download">Download PFP</button>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('preview');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const radius = width / 2;
+
+        let userImg = null;
+        let borders = [];
+
+        // Load border images
+        for (let i = 1; i <= 3; i++) {
+            let img = new Image();
+            img.src = `https://github.com/your-username/your-repo/raw/main/border${i}.png`;
+            borders.push(img);
+        }
+
+        // Redraw function
+        function redraw() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Draw white circle background clipped
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+            ctx.clip();
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+
+            // Draw user image if available, clipped to circle
+            if (userImg) {
+                const scale = Math.max(width / userImg.width, height / userImg.height);
+                const dw = userImg.width * scale;
+                const dh = userImg.height * scale;
+                const dx = (width - dw) / 2;
+                const dy = (height - dh) / 2;
+                ctx.drawImage(userImg, dx, dy, dw, dh);
+            }
+            ctx.restore();
+
+            // Draw selected border overlay (not clipped)
+            const selected = getSelectedBorder();
+            if (selected > 0 && borders[selected - 1].complete) {
+                ctx.drawImage(borders[selected - 1], 0, 0, width, height);
+            }
+        }
+
+        // Get selected border
+        function getSelectedBorder() {
+            const selectedRadio = document.querySelector('input[name="border"]:checked');
+            return selectedRadio ? parseInt(selectedRadio.value) : 0;
+        }
+
+        // Event listeners for border selection
+        const borderRadios = document.querySelectorAll('input[name="border"]');
+        borderRadios.forEach(radio => {
+            radio.addEventListener('change', redraw);
+        });
+
+        // Upload image
+        const uploadInput = document.getElementById('upload');
+        uploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        userImg = img;
+                        redraw();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Download button
+        const downloadBtn = document.getElementById('download');
+        downloadBtn.addEventListener('click', () => {
+            const dataURL = canvas.toDataURL('image/png');
+            const a = document.createElement('a');
+            a.href = dataURL;
+            a.download = 'intuition-pfp.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        });
+
+        // Initial draw (with default border)
+        // Wait for borders to load
+        Promise.all(borders.map(img => new Promise(resolve => {
+            if (img.complete) resolve();
+            else img.onload = resolve;
+        }))).then(redraw);
+    </script>
+</body>
+</html>
