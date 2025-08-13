@@ -54,6 +54,7 @@
             display: block;
             margin: 20px auto;
             border: 4px solid #ffffff; /* Default white border */
+            transition: all 0.2s ease; /* Smooth preview updates */
         }
 
         .borders {
@@ -89,49 +90,6 @@
             font-weight: 700;
             font-size: 0.9em;
             margin: 0;
-        }
-
-        .resize-buttons {
-            display: none; /* Hidden until image is uploaded */
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
-
-        .resize-buttons.active {
-            display: flex;
-        }
-
-        .resize-buttons button {
-            background-color: #ffffff;
-            color: #0b0b0b;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9em;
-        }
-
-        .scroll-controls {
-            display: none; /* Hidden until image is uploaded */
-            justify-content: center;
-            margin-bottom: 10px;
-        }
-
-        .scroll-controls.active {
-            display: flex;
-        }
-
-        .scroll-controls label {
-            margin-right: 10px;
-            font-size: 0.9em;
-            font-weight: 700;
-        }
-
-        .scroll-controls input[type="range"] {
-            width: 100px;
-            margin: 0 10px;
         }
 
         .footer {
@@ -184,22 +142,6 @@
                 gap: 10px;
             }
 
-            .resize-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .scroll-controls {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .scroll-controls label {
-                margin-right: 0;
-                margin-bottom: 5px;
-            }
-
             .footer {
                 font-size: 0.7em;
             }
@@ -216,14 +158,6 @@
             <label><input type="radio" name="border" value="1" checked> Border 1</label>
             <label><input type="radio" name="border" value="2"> Border 2</label>
             <label><input type="radio" name="border" value="3"> Border 3</label>
-        </div>
-        <div class="resize-buttons">
-            <button id="zoom-in">+</button>
-            <button id="zoom-out">-</button>
-        </div>
-        <div class="scroll-controls">
-            <label for="scroll-range">Scroll:</label>
-            <input type="range" id="scroll-range" min="-75" max="75" value="0">
         </div>
         <div class="buttons">
             <label for="upload">Upload PFP</label>
@@ -243,56 +177,57 @@
 
         let userImg = null;
         let borders = [];
-        let scale = 0.9; // Initial scale (90% of canvas size)
-        let yOffset = 0; // Vertical offset for scrolling
 
-        // Load border images with error handling
+        // Load border images with error handling (optional, as masking doesn't depend on them)
         for (let i = 1; i <= 3; i++) {
             let img = new Image();
+            img.crossOrigin = "anonymous"; // Enable CORS
             img.src = `https://github.com/PellerC/intuition-pfp/raw/main/border${i}.png`;
-            img.onerror = () => console.error(`Failed to load border${i}.png`);
+            img.onerror = () => console.warn(`Border ${i} failed to load. Check https://github.com/PellerC/intuition-pfp/raw/main/border${i}.png. Masking will proceed without it.`);
+            img.onload = () => {
+                console.log(`Border ${i} loaded successfully`);
+                redraw(); // Redraw when a border loads
+            };
             borders.push(img);
         }
 
-        // Redraw function with dynamic border, scale, and yOffset
+        // Redraw function with circular masking
         function redraw() {
             const selected = getSelectedBorder();
-            // Update canvas border based on selected border
-            if (selected === 3) {
-                canvas.style.border = '4px solid #000000'; // Black border for border3
+            // Update canvas border based on selected border (default to white if border image fails)
+            canvas.style.border = '4px solid #ffffff'; // Default white border
+            ctx.fillStyle = 'white'; // Default white background
+            if (selected === 3 && borders[selected - 1].complete && borders[selected - 1].naturalWidth > 0) {
+                canvas.style.border = '4px solid #000000'; // Black border for border3 if loaded
                 ctx.fillStyle = '#000000'; // Black background for border3
-                ctx.fillRect(0, 0, width, height);
-            } else {
-                canvas.style.border = '4px solid #ffffff'; // White border for others
-                ctx.fillStyle = 'white'; // White background for others
-                ctx.fillRect(0, 0, width, height);
             }
             if (window.innerWidth <= 600) {
-                canvas.style.border = selected === 3 ? '3px solid #000000' : '3px solid #ffffff';
+                canvas.style.border = selected === 3 && borders[selected - 1].complete && borders[selected - 1].naturalWidth > 0 ? '3px solid #000000' : '3px solid #ffffff';
             }
+            ctx.fillRect(0, 0, width, height);
 
             ctx.save();
             ctx.beginPath();
             ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
             ctx.clip();
 
-            // Clear clipped area
-            ctx.fillStyle = selected === 3 ? '#000000' : 'white';
+            // Clear clipped area and draw background
+            ctx.fillStyle = selected === 3 && borders[selected - 1].complete && borders[selected - 1].naturalWidth > 0 ? '#000000' : 'white';
             ctx.fillRect(0, 0, width, height);
 
-            // Draw user image if available, centered and scaled with yOffset
+            // Draw user image if available, masked inside circle
             if (userImg) {
-                const imgScale = Math.min(width / userImg.width, height / userImg.height) * scale;
-                const dw = userImg.width * imgScale;
-                const dh = userImg.height * imgScale;
+                const scale = Math.min(width / userImg.width, height / userImg.height); // Auto-scale to fit
+                const dw = userImg.width * scale;
+                const dh = userImg.height * scale;
                 const dx = (width - dw) / 2;
-                const dy = (height - dh) / 2 + yOffset;
+                const dy = (height - dh) / 2;
                 ctx.drawImage(userImg, dx, dy, dw, dh);
             }
             ctx.restore();
 
             // Draw selected border overlay (not clipped), scaled to fit canvas
-            if (selected > 0 && borders[selected - 1].complete) {
+            if (selected > 0 && borders[selected - 1].complete && borders[selected - 1].naturalWidth > 0) {
                 const borderImg = borders[selected - 1];
                 const borderScale = Math.min(width / borderImg.width, height / borderImg.height);
                 const dw = borderImg.width * borderScale;
@@ -315,72 +250,83 @@
             radio.addEventListener('change', redraw);
         });
 
-        // Upload image
+        // Upload image with circular masking
         const uploadInput = document.getElementById('upload');
-        const resizeButtons = document.querySelector('.resize-buttons');
-        const scrollControls = document.querySelector('.scroll-controls');
-        const zoomInBtn = document.getElementById('zoom-in');
-        const zoomOutBtn = document.getElementById('zoom-out');
-        const scrollRange = document.getElementById('scroll-range');
-
         uploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const img = new Image();
+                    img.crossOrigin = "anonymous"; // Ensure no taint
                     img.onload = () => {
                         userImg = img;
-                        scale = 0.9; // Reset scale to default
-                        yOffset = 0; // Reset yOffset
-                        resizeButtons.classList.add('active'); // Show resize buttons
-                        scrollControls.classList.add('active'); // Show scroll controls
-                        redraw();
+                        redraw(); // Apply circular mask immediately
                     };
+                    img.onerror = () => console.error("Failed to load uploaded PFP");
                     img.src = e.target.result;
                 };
                 reader.readAsDataURL(file);
             }
         });
 
-        // Zoom in and out
-        zoomInBtn.addEventListener('click', () => {
-            if (scale < 1.0) {
-                scale += 0.1;
-                redraw();
-            }
-        });
-
-        zoomOutBtn.addEventListener('click', () => {
-            if (scale > 0.5) {
-                scale -= 0.1;
-                redraw();
-            }
-        });
-
-        // Scroll with range input
-        scrollRange.addEventListener('input', (event) => {
-            yOffset = parseInt(event.target.value);
-            redraw();
-        });
-
-        // Download button with fix
+        // Download button with tainted canvas fallback
         const downloadBtn = document.getElementById('download');
         downloadBtn.addEventListener('click', () => {
-            redraw(); // Ensure canvas is fully rendered
-            setTimeout(() => {
+            if (!userImg) {
+                alert('Please upload a PFP first.');
+                return;
+            }
+            redraw(); // Ensure canvas is updated
+            requestAnimationFrame(() => {
                 const dataURL = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = dataURL;
-                a.download = 'intuition-pfp.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }, 100); // Small delay to ensure rendering
+                console.log('DataURL length:', dataURL.length); // Debug log
+                if (dataURL && dataURL.length > 0) {
+                    const a = document.createElement('a');
+                    a.href = dataURL;
+                    a.download = 'intuition-pfp.png';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                } else {
+                    console.error('Download failed: Canvas may be tainted or empty. Attempting fallback.');
+                    const fallbackCanvas = document.createElement('canvas');
+                    fallbackCanvas.width = width;
+                    fallbackCanvas.height = height;
+                    const fallbackCtx = fallbackCanvas.getContext('2d');
+                    fallbackCtx.fillStyle = ctx.fillStyle;
+                    fallbackCtx.fillRect(0, 0, width, height);
+                    if (userImg) {
+                        const scale = Math.min(width / userImg.width, height / userImg.height);
+                        const dw = userImg.width * scale;
+                        const dh = userImg.height * scale;
+                        const dx = (width - dw) / 2;
+                        const dy = (height - dh) / 2;
+                        fallbackCtx.save();
+                        fallbackCtx.beginPath();
+                        fallbackCtx.arc(radius, radius, radius, 0, 2 * Math.PI);
+                        fallbackCtx.clip();
+                        fallbackCtx.drawImage(userImg, dx, dy, dw, dh);
+                        fallbackCtx.restore();
+                    }
+                    const fallbackDataURL = fallbackCanvas.toDataURL('image/png');
+                    if (fallbackDataURL && fallbackDataURL.length > 0) {
+                        const a = document.createElement('a');
+                        a.href = fallbackDataURL;
+                        a.download = 'intuition-pfp.png';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        console.log('Fallback download succeeded. DataURL length:', fallbackDataURL.length);
+                    } else {
+                        console.error('Fallback failed: Canvas still tainted or empty.');
+                        alert('Download failed. Check console for details or ensure images load correctly.');
+                    }
+                }
+            });
         });
 
-        // Initial draw (with default border)
-        // Wait for borders to load
+        // Initial draw
         Promise.all(borders.map(img => new Promise(resolve => {
             if (img.complete) resolve();
             else img.onload = resolve;
