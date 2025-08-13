@@ -231,7 +231,7 @@
             <button id="download">Download PFP</button>
         </div>
         <div class="footer">
-            Built with Love by <a href="https://twitter.com/opeyemi21094" target="_blank">NEWBIE</a>
+            built with ❤️ by <a href="https://twitter.com/opeyemi21094" target="_blank">Newbie</a>
         </div>
     </div>
     <script>
@@ -364,16 +364,19 @@
             redraw();
         });
 
-        // Download button
+        // Download button with fix
         const downloadBtn = document.getElementById('download');
         downloadBtn.addEventListener('click', () => {
-            const dataURL = canvas.toDataURL('image/png');
-            const a = document.createElement('a');
-            a.href = dataURL;
-            a.download = 'intuition-pfp.png';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+            redraw(); // Ensure canvas is fully rendered
+            setTimeout(() => {
+                const dataURL = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = 'intuition-pfp.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }, 100); // Small delay to ensure rendering
         });
 
         // Initial draw (with default border)
