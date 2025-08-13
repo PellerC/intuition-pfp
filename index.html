@@ -92,10 +92,14 @@
         }
 
         .resize-buttons {
-            display: flex;
+            display: none; /* Hidden until image is uploaded */
             justify-content: center;
             gap: 20px;
             margin-bottom: 10px;
+        }
+
+        .resize-buttons.active {
+            display: flex;
         }
 
         .resize-buttons button {
@@ -107,6 +111,27 @@
             cursor: pointer;
             font-weight: 700;
             font-size: 0.9em;
+        }
+
+        .scroll-controls {
+            display: none; /* Hidden until image is uploaded */
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .scroll-controls.active {
+            display: flex;
+        }
+
+        .scroll-controls label {
+            margin-right: 10px;
+            font-size: 0.9em;
+            font-weight: 700;
+        }
+
+        .scroll-controls input[type="range"] {
+            width: 100px;
+            margin: 0 10px;
         }
 
         .footer {
@@ -164,6 +189,17 @@
                 gap: 10px;
             }
 
+            .scroll-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .scroll-controls label {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+
             .footer {
                 font-size: 0.7em;
             }
@@ -185,6 +221,10 @@
             <button id="zoom-in">+</button>
             <button id="zoom-out">-</button>
         </div>
+        <div class="scroll-controls">
+            <label for="scroll-range">Scroll:</label>
+            <input type="range" id="scroll-range" min="-75" max="75" value="0">
+        </div>
         <div class="buttons">
             <label for="upload">Upload PFP</label>
             <input type="file" id="upload" accept="image/*">
@@ -204,6 +244,7 @@
         let userImg = null;
         let borders = [];
         let scale = 0.9; // Initial scale (90% of canvas size)
+        let yOffset = 0; // Vertical offset for scrolling
 
         // Load border images with error handling
         for (let i = 1; i <= 3; i++) {
@@ -213,32 +254,39 @@
             borders.push(img);
         }
 
-        // Redraw function with dynamic border and scale
+        // Redraw function with dynamic border, scale, and yOffset
         function redraw() {
             const selected = getSelectedBorder();
             // Update canvas border based on selected border
-            canvas.style.border = selected === 3 ? '4px solid #000000' : '4px solid #ffffff';
+            if (selected === 3) {
+                canvas.style.border = '4px solid #000000'; // Black border for border3
+                ctx.fillStyle = '#000000'; // Black background for border3
+                ctx.fillRect(0, 0, width, height);
+            } else {
+                canvas.style.border = '4px solid #ffffff'; // White border for others
+                ctx.fillStyle = 'white'; // White background for others
+                ctx.fillRect(0, 0, width, height);
+            }
             if (window.innerWidth <= 600) {
                 canvas.style.border = selected === 3 ? '3px solid #000000' : '3px solid #ffffff';
             }
 
-            ctx.clearRect(0, 0, width, height);
-
-            // Draw white circle background clipped
             ctx.save();
             ctx.beginPath();
             ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
             ctx.clip();
-            ctx.fillStyle = 'white';
+
+            // Clear clipped area
+            ctx.fillStyle = selected === 3 ? '#000000' : 'white';
             ctx.fillRect(0, 0, width, height);
 
-            // Draw user image if available, centered and scaled
+            // Draw user image if available, centered and scaled with yOffset
             if (userImg) {
                 const imgScale = Math.min(width / userImg.width, height / userImg.height) * scale;
                 const dw = userImg.width * imgScale;
                 const dh = userImg.height * imgScale;
                 const dx = (width - dw) / 2;
-                const dy = (height - dh) / 2;
+                const dy = (height - dh) / 2 + yOffset;
                 ctx.drawImage(userImg, dx, dy, dw, dh);
             }
             ctx.restore();
@@ -269,6 +317,12 @@
 
         // Upload image
         const uploadInput = document.getElementById('upload');
+        const resizeButtons = document.querySelector('.resize-buttons');
+        const scrollControls = document.querySelector('.scroll-controls');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const scrollRange = document.getElementById('scroll-range');
+
         uploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -277,7 +331,10 @@
                     const img = new Image();
                     img.onload = () => {
                         userImg = img;
-                        scale = 0.9; // Reset scale to default when new image is uploaded
+                        scale = 0.9; // Reset scale to default
+                        yOffset = 0; // Reset yOffset
+                        resizeButtons.classList.add('active'); // Show resize buttons
+                        scrollControls.classList.add('active'); // Show scroll controls
                         redraw();
                     };
                     img.src = e.target.result;
@@ -287,21 +344,24 @@
         });
 
         // Zoom in and out
-        const zoomInBtn = document.getElementById('zoom-in');
-        const zoomOutBtn = document.getElementById('zoom-out');
-
         zoomInBtn.addEventListener('click', () => {
-            if (scale < 1.0) { // Limit to 100% of canvas size
+            if (scale < 1.0) {
                 scale += 0.1;
                 redraw();
             }
         });
 
         zoomOutBtn.addEventListener('click', () => {
-            if (scale > 0.5) { // Limit to 50% of canvas size
+            if (scale > 0.5) {
                 scale -= 0.1;
                 redraw();
             }
+        });
+
+        // Scroll with range input
+        scrollRange.addEventListener('input', (event) => {
+            yOffset = parseInt(event.target.value);
+            redraw();
         });
 
         // Download button
