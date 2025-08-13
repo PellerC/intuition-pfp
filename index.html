@@ -1,390 +1,391 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Intuition PFP Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #1A2A44, #5C2E2E); /* Dark blue to reddish-brown gradient */
-            font-family: 'Inter', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            color: #ffffff;
-        }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intuition PFP Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #1A2A44, #5C2E2E); /* Dark blue to reddish-brown gradient */
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: #ffffff;
+        }
 
-        .container {
-            background: linear-gradient(135deg, #1A2A44, #5C2E2E); /* Match body background */
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            max-width: 600px;
-            width: 90%;
-            box-sizing: border-box;
-        }
+        .container {
+            background: linear-gradient(135deg, #1A2A44, #5C2E2E); /* Match body background */
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            box-sizing: border-box;
+        }
 
-        .logo {
-            width: 60px;
-            height: 60px;
-            margin-bottom: 20px;
-        }
+        .logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 20px;
+        }
 
-        h1 {
-            font-size: 2.5em;
-            font-weight: 700;
-            color: #ffffff;
-            margin: 0 0 10px 0;
-        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #ffffff;
+            margin: 0 0 10px 0;
+        }
 
-        p {
-            font-size: 0.9em;
-            font-weight: 400;
-            color: #ffffff;
-            margin: 0 0 20px 0;
-        }
+        p {
+            font-size: 0.9em;
+            font-weight: 400;
+            color: #ffffff;
+            margin: 0 0 20px 0;
+        }
 
-        #preview {
-            background-color: transparent;
-            border-radius: 50%;
-            display: block;
-            margin: 20px auto;
-            border: 4px solid #ffffff; /* Default white border */
-        }
+        #preview {
+            background-color: transparent;
+            border-radius: 50%;
+            display: block;
+            margin: 20px auto;
+            border: 4px solid #ffffff; /* Default white border */
+        }
 
-        .borders {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+        .borders {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
 
-        .borders label {
-            font-size: 0.9em;
-            cursor: pointer;
-        }
+        .borders label {
+            font-size: 0.9em;
+            cursor: pointer;
+        }
 
-        .buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
 
-        .buttons input[type="file"] {
-            display: none;
-        }
+        .buttons input[type="file"] {
+            display: none;
+        }
 
-        .buttons label, .buttons button {
-            background-color: #ffffff;
-            color: #0b0b0b;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9em;
-            margin: 0;
-        }
+        .buttons label, .buttons button {
+            background-color: #ffffff;
+            color: #0b0b0b;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin: 0;
+        }
 
-        .resize-buttons {
-            display: none; /* Hidden until image is uploaded */
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 10px;
-        }
+        .resize-buttons {
+            display: none; /* Hidden until image is uploaded */
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 10px;
+        }
 
-        .resize-buttons.active {
-            display: flex;
-        }
+        .resize-buttons.active {
+            display: flex;
+        }
 
-        .resize-buttons button {
-            background-color: #ffffff;
-            color: #0b0b0b;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.9em;
-        }
+        .resize-buttons button {
+            background-color: #ffffff;
+            color: #0b0b0b;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.9em;
+        }
 
-        .scroll-controls {
-            display: none; /* Hidden until image is uploaded */
-            justify-content: center;
-            margin-bottom: 10px;
-        }
+        .scroll-controls {
+            display: none; /* Hidden until image is uploaded */
+            justify-content: center;
+            margin-bottom: 10px;
+        }
 
-        .scroll-controls.active {
-            display: flex;
-        }
+        .scroll-controls.active {
+            display: flex;
+        }
 
-        .scroll-controls label {
-            margin-right: 10px;
-            font-size: 0.9em;
-            font-weight: 700;
-        }
+        .scroll-controls label {
+            margin-right: 10px;
+            font-size: 0.9em;
+            font-weight: 700;
+        }
 
-        .scroll-controls input[type="range"] {
-            width: 100px;
-            margin: 0 10px;
-        }
+        .scroll-controls input[type="range"] {
+            width: 100px;
+            margin: 0 10px;
+        }
 
-        .footer {
-            margin-top: 20px;
-            font-size: 0.8em;
-        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
 
-        .footer a {
-            color: #1DA1F2;
-            text-decoration: none;
-            font-weight: 700;
-        }
+        .footer a {
+            color: #1DA1F2;
+            text-decoration: none;
+            font-weight: 700;
+        }
 
-        .footer a:hover {
-            text-decoration: underline;
-        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
 
-        @media (max-width: 600px) {
-            .logo {
-                width: 50px;
-                height: 50px;
-                margin-bottom: 15px;
-            }
+        @media (max-width: 600px) {
+            .logo {
+                width: 50px;
+                height: 50px;
+                margin-bottom: 15px;
+            }
 
-            h1 {
-                font-size: 2em;
-            }
+            h1 {
+                font-size: 2em;
+            }
 
-            p {
-                font-size: 0.85em;
-            }
+            p {
+                font-size: 0.85em;
+            }
 
-            .container {
-                padding: 15px;
-            }
+            .container {
+                padding: 15px;
+            }
 
-            #preview {
-                width: 250px;
-                height: 250px;
-                border: 3px solid #ffffff; /* Adjusted border for mobile */
-            }
+            #preview {
+                width: 250px;
+                height: 250px;
+                border: 3px solid #ffffff; /* Adjusted border for mobile */
+            }
 
-            .borders {
-                flex-direction: column;
-                gap: 10px;
-            }
+            .borders {
+                flex-direction: column;
+                gap: 10px;
+            }
 
-            .buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
+            .buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
 
-            .resize-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
+            .resize-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
 
-            .scroll-controls {
-                flex-direction: column;
-                align-items: center;
-                gap: 10px;
-            }
+            .scroll-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
 
-            .scroll-controls label {
-                margin-right: 0;
-                margin-bottom: 5px;
-            }
+            .scroll-controls label {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
 
-            .footer {
-                font-size: 0.7em;
-            }
-        }
-    </style>
+            .footer {
+                font-size: 0.7em;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <img src="https://github.com/PellerC/intuition-pfp/raw/main/mainlogo.png" alt="Intuition Logo" class="logo">
-        <h1>Intuition PFP Generator</h1>
-        <p>Join our community and transform your profile picture into a unique Intuition PFP with custom borders!</p>
-        <canvas id="preview" width="300" height="300"></canvas>
-        <div class="borders">
-            <label><input type="radio" name="border" value="1" checked> Border 1</label>
-            <label><input type="radio" name="border" value="2"> Border 2</label>
-            <label><input type="radio" name="border" value="3"> Border 3</label>
-        </div>
-        <div class="resize-buttons">
-            <button id="zoom-in">+</button>
-            <button id="zoom-out">-</button>
-        </div>
-        <div class="scroll-controls">
-            <label for="scroll-range">Scroll:</label>
-            <input type="range" id="scroll-range" min="-75" max="75" value="0">
-        </div>
-        <div class="buttons">
-            <label for="upload">Upload PFP</label>
-            <input type="file" id="upload" accept="image/*">
-            <button id="download">Download PFP</button>
-        </div>
-        <div class="footer">
-            built with ❤️ by <a href="https://twitter.com/opeyemi21094" target="_blank">Newbie</a>
-        </div>
-    </div>
-    <script>
-        const canvas = document.getElementById('preview');
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width;
-        const height = canvas.height;
-        const radius = width / 2;
+    <div class="container">
+        <img src="https://github.com/PellerC/intuition-pfp/raw/main/mainlogo.png" alt="Intuition Logo" class="logo">
+        <h1>Intuition PFP Generator</h1>
+        <p>Join our community and transform your profile picture into a unique Intuition PFP with custom borders!</p>
+        <canvas id="preview" width="300" height="300"></canvas>
+        <div class="borders">
+            <label><input type="radio" name="border" value="1" checked> Border 1</label>
+            <label><input type="radio" name="border" value="2"> Border 2</label>
+            <label><input type="radio" name="border" value="3"> Border 3</label>
+        </div>
+        <div class="resize-buttons">
+            <button id="zoom-in">+</button>
+            <button id="zoom-out">-</button>
+        </div>
+        <div class="scroll-controls">
+            <label for="scroll-range">Scroll:</label>
+            <input type="range" id="scroll-range" min="-75" max="75" value="0">
+        </div>
+        <div class="buttons">
+            <label for="upload">Upload PFP</label>
+            <input type="file" id="upload" accept="image/*">
+            <button id="download">Download PFP</button>
+        </div>
+        <div class="footer">
+            built with ❤️ by <a href="https://twitter.com/opeyemi21094" target="_blank">Newbie</a>
+        </div>
+    </div>
+    <script>
+        const canvas = document.getElementById('preview');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const radius = width / 2;
 
-        let userImg = null;
-        let borders = [];
-        let scale = 0.9; // Initial scale (90% of canvas size)
-        let yOffset = 0; // Vertical offset for scrolling
+        let userImg = null;
+        let borders = [];
+        let scale = 0.9; // Initial scale (90% of canvas size)
+        let yOffset = 0; // Vertical offset for scrolling
 
-        // Load border images with error handling
-        for (let i = 1; i <= 3; i++) {
-            let img = new Image();
-            img.src = `https://github.com/PellerC/intuition-pfp/raw/main/border${i}.png`;
-            img.onerror = () => console.error(`Failed to load border${i}.png`);
-            borders.push(img);
-        }
+        // Load border images with error handling
+        for (let i = 1; i <= 3; i++) {
+            let img = new Image();
+            img.crossOrigin = "anonymous"; // This is the added fix
+            img.src = `https://github.com/PellerC/intuition-pfp/raw/main/border${i}.png`;
+            img.onerror = () => console.error(`Failed to load border${i}.png`);
+            borders.push(img);
+        }
 
-        // Redraw function with dynamic border, scale, and yOffset
-        function redraw() {
-            const selected = getSelectedBorder();
-            // Update canvas border based on selected border
-            if (selected === 3) {
-                canvas.style.border = '4px solid #000000'; // Black border for border3
-                ctx.fillStyle = '#000000'; // Black background for border3
-                ctx.fillRect(0, 0, width, height);
-            } else {
-                canvas.style.border = '4px solid #ffffff'; // White border for others
-                ctx.fillStyle = 'white'; // White background for others
-                ctx.fillRect(0, 0, width, height);
-            }
-            if (window.innerWidth <= 600) {
-                canvas.style.border = selected === 3 ? '3px solid #000000' : '3px solid #ffffff';
-            }
+        // Redraw function with dynamic border, scale, and yOffset
+        function redraw() {
+            const selected = getSelectedBorder();
+            // Update canvas border based on selected border
+            if (selected === 3) {
+                canvas.style.border = '4px solid #000000'; // Black border for border3
+                ctx.fillStyle = '#000000'; // Black background for border3
+                ctx.fillRect(0, 0, width, height);
+            } else {
+                canvas.style.border = '4px solid #ffffff'; // White border for others
+                ctx.fillStyle = 'white'; // White background for others
+                ctx.fillRect(0, 0, width, height);
+            }
+            if (window.innerWidth <= 600) {
+                canvas.style.border = selected === 3 ? '3px solid #000000' : '3px solid #ffffff';
+            }
 
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
-            ctx.clip();
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(radius, radius, radius, 0, 2 * Math.PI);
+            ctx.clip();
 
-            // Clear clipped area
-            ctx.fillStyle = selected === 3 ? '#000000' : 'white';
-            ctx.fillRect(0, 0, width, height);
+            // Clear clipped area
+            ctx.fillStyle = selected === 3 ? '#000000' : 'white';
+            ctx.fillRect(0, 0, width, height);
 
-            // Draw user image if available, centered and scaled with yOffset
-            if (userImg) {
-                const imgScale = Math.min(width / userImg.width, height / userImg.height) * scale;
-                const dw = userImg.width * imgScale;
-                const dh = userImg.height * imgScale;
-                const dx = (width - dw) / 2;
-                const dy = (height - dh) / 2 + yOffset;
-                ctx.drawImage(userImg, dx, dy, dw, dh);
-            }
-            ctx.restore();
+            // Draw user image if available, centered and scaled with yOffset
+            if (userImg) {
+                const imgScale = Math.min(width / userImg.width, height / userImg.height) * scale;
+                const dw = userImg.width * imgScale;
+                const dh = userImg.height * imgScale;
+                const dx = (width - dw) / 2;
+                const dy = (height - dh) / 2 + yOffset;
+                ctx.drawImage(userImg, dx, dy, dw, dh);
+            }
+            ctx.restore();
 
-            // Draw selected border overlay (not clipped), scaled to fit canvas
-            if (selected > 0 && borders[selected - 1].complete) {
-                const borderImg = borders[selected - 1];
-                const borderScale = Math.min(width / borderImg.width, height / borderImg.height);
-                const dw = borderImg.width * borderScale;
-                const dh = borderImg.height * borderScale;
-                const dx = (width - dw) / 2;
-                const dy = (height - dh) / 2;
-                ctx.drawImage(borderImg, dx, dy, dw, dh);
-            }
-        }
+            // Draw selected border overlay (not clipped), scaled to fit canvas
+            if (selected > 0 && borders[selected - 1].complete) {
+                const borderImg = borders[selected - 1];
+                const borderScale = Math.min(width / borderImg.width, height / borderImg.height);
+                const dw = borderImg.width * borderScale;
+                const dh = borderImg.height * borderScale;
+                const dx = (width - dw) / 2;
+                const dy = (height - dh) / 2;
+                ctx.drawImage(borderImg, dx, dy, dw, dh);
+            }
+        }
 
-        // Get selected border
-        function getSelectedBorder() {
-            const selectedRadio = document.querySelector('input[name="border"]:checked');
-            return selectedRadio ? parseInt(selectedRadio.value) : 0;
-        }
+        // Get selected border
+        function getSelectedBorder() {
+            const selectedRadio = document.querySelector('input[name="border"]:checked');
+            return selectedRadio ? parseInt(selectedRadio.value) : 0;
+        }
 
-        // Event listeners for border selection
-        const borderRadios = document.querySelectorAll('input[name="border"]');
-        borderRadios.forEach(radio => {
-            radio.addEventListener('change', redraw);
-        });
+        // Event listeners for border selection
+        const borderRadios = document.querySelectorAll('input[name="border"]');
+        borderRadios.forEach(radio => {
+            radio.addEventListener('change', redraw);
+        });
 
-        // Upload image
-        const uploadInput = document.getElementById('upload');
-        const resizeButtons = document.querySelector('.resize-buttons');
-        const scrollControls = document.querySelector('.scroll-controls');
-        const zoomInBtn = document.getElementById('zoom-in');
-        const zoomOutBtn = document.getElementById('zoom-out');
-        const scrollRange = document.getElementById('scroll-range');
+        // Upload image
+        const uploadInput = document.getElementById('upload');
+        const resizeButtons = document.querySelector('.resize-buttons');
+        const scrollControls = document.querySelector('.scroll-controls');
+        const zoomInBtn = document.getElementById('zoom-in');
+        const zoomOutBtn = document.getElementById('zoom-out');
+        const scrollRange = document.getElementById('scroll-range');
 
-        uploadInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        userImg = img;
-                        scale = 0.9; // Reset scale to default
-                        yOffset = 0; // Reset yOffset
-                        resizeButtons.classList.add('active'); // Show resize buttons
-                        scrollControls.classList.add('active'); // Show scroll controls
-                        redraw();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
+        uploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        userImg = img;
+                        scale = 0.9; // Reset scale to default
+                        yOffset = 0; // Reset yOffset
+                        resizeButtons.classList.add('active'); // Show resize buttons
+                        scrollControls.classList.add('active'); // Show scroll controls
+                        redraw();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-        // Zoom in and out
-        zoomInBtn.addEventListener('click', () => {
-            if (scale < 1.0) {
-                scale += 0.1;
-                redraw();
-            }
-        });
+        // Zoom in and out
+        zoomInBtn.addEventListener('click', () => {
+            if (scale < 1.0) {
+                scale += 0.1;
+                redraw();
+            }
+        });
 
-        zoomOutBtn.addEventListener('click', () => {
-            if (scale > 0.5) {
-                scale -= 0.1;
-                redraw();
-            }
-        });
+        zoomOutBtn.addEventListener('click', () => {
+            if (scale > 0.5) {
+                scale -= 0.1;
+                redraw();
+            }
+        });
 
-        // Scroll with range input
-        scrollRange.addEventListener('input', (event) => {
-            yOffset = parseInt(event.target.value);
-            redraw();
-        });
+        // Scroll with range input
+        scrollRange.addEventListener('input', (event) => {
+            yOffset = parseInt(event.target.value);
+            redraw();
+        });
 
-        // Download button with fix
-        const downloadBtn = document.getElementById('download');
-        downloadBtn.addEventListener('click', () => {
-            redraw(); // Ensure canvas is fully rendered
-            setTimeout(() => {
-                const dataURL = canvas.toDataURL('image/png');
-                const a = document.createElement('a');
-                a.href = dataURL;
-                a.download = 'intuition-pfp.png';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-            }, 100); // Small delay to ensure rendering
-        });
+        // Download button with fix
+        const downloadBtn = document.getElementById('download');
+        downloadBtn.addEventListener('click', () => {
+            redraw(); // Ensure canvas is fully rendered
+            setTimeout(() => {
+                const dataURL = canvas.toDataURL('image/png');
+                const a = document.createElement('a');
+                a.href = dataURL;
+                a.download = 'intuition-pfp.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+            }, 100); // Small delay to ensure rendering
+        });
 
-        // Initial draw (with default border)
-        // Wait for borders to load
-        Promise.all(borders.map(img => new Promise(resolve => {
-            if (img.complete) resolve();
-            else img.onload = resolve;
-        }))).then(redraw);
-    </script>
+        // Initial draw (with default border)
+        // Wait for borders to load
+        Promise.all(borders.map(img => new Promise(resolve => {
+            if (img.complete) resolve();
+            else img.onload = resolve;
+        }))).then(redraw);
+    </script>
 </body>
 </html>
